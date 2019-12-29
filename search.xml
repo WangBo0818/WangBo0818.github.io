@@ -1,6 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>java主流锁之悲观锁和乐观锁的简单模拟实现</title>
+    <url>/2019/12/29/java%E4%B8%BB%E6%B5%81%E9%94%81%E4%B9%8B%E6%82%B2%E8%A7%82%E9%94%81%E5%92%8C%E4%B9%90%E8%A7%82%E9%94%81%E7%9A%84%E7%AE%80%E5%8D%95%E6%A8%A1%E6%8B%9F%E5%AE%9E%E7%8E%B0/</url>
+    <content><![CDATA[<p>在上一篇文章<a href="https://blog.csdn.net/wangbo818/article/details/103747333" target="_blank" rel="noopener">java主流锁之悲观锁和乐观锁</a>中，我们已经知道了什么是乐观锁和悲观锁以及他们的实现方式和使用场景。</p>
+<p>现在就来简单模拟实现悲观锁和乐观锁</p>
+<h2 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h2><p><strong>首先在数据库中创建一张goods 表</strong><br><img src="https://img-blog.csdnimg.cn/20191228224524227.png" alt="创建goods表"><br><strong>向数据库中插入一条记录</strong><br><img src="https://img-blog.csdnimg.cn/20191228224657968.png" alt="插入数据"><br><strong>如果要进行减少count 操作的话，则首先查询出count 数量，若count 数量大于0，则可以进行修改操作。悲观锁是在查询的时候就将该条记录锁定</strong><br><img src="https://img-blog.csdnimg.cn/20191229152215694.png" alt="开启事务"><br><strong>此时其他的客户端只能进行查询操作，而无法进行其他任何操作</strong><br><img src="https://img-blog.csdnimg.cn/20191229152309174.png" alt="阻塞"><br><strong>只有等拿到锁的客户端提交事务，另一个客户端才可以再对其进行修改等操作</strong><br><img src="https://img-blog.csdnimg.cn/20191229152431998.png" alt="commit"><br><img src="https://img-blog.csdnimg.cn/20191229152505737.png" alt="修改成功"></p>
+<h2 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h2><p><strong>首先在数据库中创建goods 表，但是与悲观锁不同的是在创建表的时候添加一个version 字段</strong><br><img src="https://img-blog.csdnimg.cn/2019122823063249.png" alt="创建goods表"><br><strong>向goods 表中插入一条记录</strong><br><img src="https://img-blog.csdnimg.cn/20191228231525447.png" alt="添加记录"><br><strong>此时如果要减少count 的话，则首先查询出count 数量，若count 数量大于0，则可以进行修改操作</strong><br><img src="https://img-blog.csdnimg.cn/20191228231839465.png" alt="查询库存"><br><img src="https://img-blog.csdnimg.cn/2019122823305733.png" alt="修改"><br><strong>此时另外开启一个MySQL 客户端，进行同样的修改操作，因为版本号不一致，所以修改失败</strong><br><img src="https://img-blog.csdnimg.cn/20191228233204609.png" alt="修改失败"><br><strong>此时用正确的版本号去修改，可以看到修改成功</strong><br><img src="https://img-blog.csdnimg.cn/20191228233344744.png" alt="修改成功"></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>java主流锁之乐观锁和悲观锁</title>
+    <url>/2019/12/28/java%E4%B8%BB%E6%B5%81%E9%94%81%E4%B9%8B%E4%B9%90%E8%A7%82%E9%94%81%E5%92%8C%E6%82%B2%E8%A7%82%E9%94%81/</url>
+    <content><![CDATA[<p>java提供了很多种类的锁，每种锁都有其特性，根据特性在适当的场景下能够展现出非常高的效率。</p>
+<p>下图来源于<a href="https://zhuanlan.zhihu.com/p/50098743" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/50098743</a><br><img src="https://img-blog.csdnimg.cn/20191228183759965.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="java主流锁"><br>在一个高并发秒杀的场景下中，很有可能会出现超卖的情况，要解决超卖的问题，可以对数据库中的表或记录加锁。我刚开始在秒杀项目中是用悲观锁来解决超卖的问题，但是在并发量很高的情况，悲观锁的效率可能不是很好，因此，我改用乐观锁来代替悲观锁。那么，什么是乐观锁和悲观锁呢？乐观锁在并发量很高的情况下性能为什么要优于悲观锁呢？怎样简单实现乐观锁和悲观锁呢（下一篇文章中实现）？</p>
+<h2 id="什么是悲观锁和乐观锁？"><a href="#什么是悲观锁和乐观锁？" class="headerlink" title="什么是悲观锁和乐观锁？"></a>什么是悲观锁和乐观锁？</h2><h3 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h3><p>正如其名，它指的是对数据被外界（包括本系统的其它事务，以及来自外部系统的事务处理）修改持保守态度，因此，每次对数据进行操作时，都会将数据置为被锁定状态，这样别的事务想要拿到这个数据都会阻塞。悲观的实现，往往依靠数据库提供的锁机制（也只有数据库提供的锁机制才能真正保证数据访问的排他性）。传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁等，读锁，写锁等，都是在做操作之前先上锁。</p>
+<p>在悲观锁的情况下，为了保证事务的隔离性，就需要一致性锁定读。读取数据时给加锁，其他事务只能读数据，而不能修改、删除数据。当修改删除数据时也要加锁，此时其他事务无法读取数据。</p>
+<h3 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h3><p>相对悲观锁而言，乐观锁采取了更为宽松的锁机制。悲观锁大部分情况下都要依靠数据库的锁机制实现，以保证操作的独占性。但是随之而来的就是数据库性能的大幅度开销，特别是对长事务来说，这样的开销往往无法接受。</p>
+<p>而乐观锁机制在一定程度上解决了这个问题。乐观锁，顾名思义，总是假设最好的情况，每次去拿数据的时候都认为只有自己一个人拿，因此就不会加锁，但是在更新的时候会判断在自己操作数据期间，有没有其他人操作过数据。</p>
+<p>乐观锁，大多是基于数据版本（Version）记录机制实现的。那什么是数据版本？数据版本就是为数据增加一个版本标识，在基于数据库表的版本解决方案中，一般是通过给数据库表增加一个”Version” 字段来实现。读取数据时，将此版本号一起读出，之后更新时，将此版本号加一。此时，将提交数据的版本数据与数据库表对应记录的当前版本信息进行比对，如果提交的数据版本号大于数据库表当前版本号，则予以更新，否则认为是过期数据。</p>
+<p>除了使用版本号机制外，还可以使用CAS算法来实现乐观锁。例如：在Java中java.util.concurrent.atomic包下面的原子变量类就是使用了乐观锁的CAS实现方式实现的。</p>
+<h3 id="乐观锁和悲观锁的使用场景"><a href="#乐观锁和悲观锁的使用场景" class="headerlink" title="乐观锁和悲观锁的使用场景"></a>乐观锁和悲观锁的使用场景</h3><p>从以上对两种锁的介绍可以知道两种锁各有其有优缺点，不能认为一种好于另一种，只是说适用于不同的场景。像乐观锁适用于写比较少的场景（多读场景），即冲突真的很少发生的时候，这样就省去了锁的开销，加到了系统的整个吞吐量。但如果是多写的情况，一般会经常发生冲突，这会导致上层的应用会不断地进行retry，这样反倒是降低了性能。所以一般多写的场景下使用悲观锁。</p>
+<h3 id="乐观锁实现方式"><a href="#乐观锁实现方式" class="headerlink" title="乐观锁实现方式"></a>乐观锁实现方式</h3><p>出来上述的基于版本号机制实现乐观锁外，最长是采用CAS（Compare And Swap（比较与交换））算法实现。CAS算法是一种有名的<strong>无锁算法</strong>。无锁编程，即不使用锁的情况下实现多线程之间的变量同步，也就是在没有线程被阻塞的情况下实现变量的同步，所以也叫非阻塞同步（Non-blocking Synchronization）</p>
+<p>CAS算法基于三个操作数：</p>
+<ul>
+<li><p>需要读写的内存值V</p>
+</li>
+<li><p>进行比较的值A</p>
+</li>
+<li><p>拟写入的新值B</p>
+<p>当且仅当 V 的值等于 A 时，CAS通过原子方式用新值B来更新V的值，否则不会执行任何操作（比较和替换是一个原子操作）。一般情况下是一个自旋操作，即不断的重试。</p>
+</li>
+</ul>
+<p>当然，虽然CAS算法很高效，但是也会存在很多问题，例如：</p>
+<ul>
+<li>ABA问题</li>
+<li>循环时间长开销大</li>
+<li>只能保证一个共享变量的原子操作</li>
+</ul>
+<p>我对这些问题产生的原因和解决方案也了解的不是很清楚，所以如果大家有兴趣的话，可以去查阅相关资料。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>PAT乙级真题题解java实现</title>
+    <url>/2019/12/28/PAT%E4%B9%99%E7%BA%A7%E7%9C%9F%E9%A2%98%E9%A2%98%E8%A7%A3java%E5%AE%9E%E7%8E%B0/</url>
+    <content><![CDATA[<p>虽然这次PAT考试的成绩并不算理想，但还是有了很多收获，特别是认识了一些很优秀的人以及他们平时怎么学习算法。</p>
+<p>我参加的2019年冬季PAT乙级考试，这个时间PAT官网上的乙级真题有95道，我是使用java来做的（推荐使用c语言）。大部分题都是通过的，部分题目超出时间限制，<br>还有一部分只通过了部分用例。</p>
+<p>以下是题目清单及我的通过情况：<br><a href="https://github.com/WangBo0818/PAT" target="_blank" rel="noopener">GitHub仓库</a></p>
+<ul>
+<li><p>完全正确</p>
+<ul>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1001.java" target="_blank" rel="noopener">1001 害死人不偿命的(3n+1)猜想</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1002.java" target="_blank" rel="noopener">1002 写出这个数</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1003.java" target="_blank" rel="noopener">1003 我要通过！</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1004.java" target="_blank" rel="noopener">1004 成绩排名</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1005.java" target="_blank" rel="noopener">1005 继续(3n+1)猜想</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1006.java" target="_blank" rel="noopener">1006 换个格式输出整数</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1007.java" target="_blank" rel="noopener">1007 素数对猜想</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1008.java" target="_blank" rel="noopener">1008 数组元素循环右移问题</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1009.java" target="_blank" rel="noopener">说反话</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1010.java" target="_blank" rel="noopener">1010 一元多项式求导</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1011.java" target="_blank" rel="noopener">1011 A+B 和 C</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1012.java" target="_blank" rel="noopener">1012 数字分类</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1013.java" target="_blank" rel="noopener">1013 数素数</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1016.java" target="_blank" rel="noopener">1016 部分A+B</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1017.java" target="_blank" rel="noopener">1017 A除以B</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1019.java" target="_blank" rel="noopener">1019 数字黑洞</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1020.java" target="_blank" rel="noopener">1020 月饼</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1021.java" target="_blank" rel="noopener">1021 个位数统计</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1022.java" target="_blank" rel="noopener">1022 D进制的A+B</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1023.java" target="_blank" rel="noopener">1023 组个最小数</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1024.java" target="_blank" rel="noopener">1024 科学计数法</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1026.java" target="_blank" rel="noopener">1026     程序运行时间</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1027.java" target="_blank" rel="noopener">1027 打印沙漏</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1029.java" target="_blank" rel="noopener">1029 旧键盘</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1036.java" target="_blank" rel="noopener">1036 跟奥巴马一起编程</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1037.java" target="_blank" rel="noopener">1037     在霍格沃茨找零钱</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1039.java" target="_blank" rel="noopener">1039 到底买不买</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1040.java" target="_blank" rel="noopener">1040 有几个PAT</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1041.java" target="_blank" rel="noopener">1041 考试座位号</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1042.java" target="_blank" rel="noopener">1042 字符统计</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1043.java" target="_blank" rel="noopener">1043 输出PATest</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1044.java" target="_blank" rel="noopener">1044 火星数字</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1046.java" target="_blank" rel="noopener">1046 划拳</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1047.java" target="_blank" rel="noopener">1047 编程团体赛</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1051.java" target="_blank" rel="noopener">1051 复数乘法</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1053.java" target="_blank" rel="noopener">1053 住房空置率</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1054.java" target="_blank" rel="noopener">1054 求平均值</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1055.java" target="_blank" rel="noopener">1055 集体照</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1056.java" target="_blank" rel="noopener">1056 组合数的和</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1057.java" target="_blank" rel="noopener">1057 数零壹</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1061.java" target="_blank" rel="noopener">1061 判断题</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1064.java" target="_blank" rel="noopener">1064 朋友数</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1067.java" target="_blank" rel="noopener">1067 试密码</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1069.java" target="_blank" rel="noopener">1069 微博转发抽奖</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1070.java" target="_blank" rel="noopener">1070 结绳</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1076.java" target="_blank" rel="noopener">1076 Wifi密码</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1077.java" target="_blank" rel="noopener">1077 互评成绩计算</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1078.java" target="_blank" rel="noopener">1078 字符串压缩与解压</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1081.java" target="_blank" rel="noopener">1081 检查密码</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1083.java" target="_blank" rel="noopener">1083 是否存在相等的差</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1084.java" target="_blank" rel="noopener">1084 外观数列</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1086.java" target="_blank" rel="noopener">1086 就不告诉你</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1087.java" target="_blank" rel="noopener">1087 有多少不同的值</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1088.java" target="_blank" rel="noopener">1088 三人行</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1089.java" target="_blank" rel="noopener">1089 狼人杀-简单版</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1090.java" target="_blank" rel="noopener">1090 危险品装箱</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1091.java" target="_blank" rel="noopener">1091 N-自守数</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1093.java" target="_blank" rel="noopener">1093 字符串A+B</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1094.java" target="_blank" rel="noopener">1094 谷歌的招聘</a></li>
+</ul>
+</li>
+<li><p>超出时间限制</p>
+<ul>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1015.java" target="_blank" rel="noopener">1015 德才论</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1018.java" target="_blank" rel="noopener">1018 锤子剪刀布</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1025.java" target="_blank" rel="noopener">1025 反转链表</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1030.java" target="_blank" rel="noopener">1030 完美数列</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1032.java" target="_blank" rel="noopener">1032 挖掘机技术哪家强</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1038.java" target="_blank" rel="noopener">1038 统计同成绩学生</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1045.java" target="_blank" rel="noopener">1045 快速排序</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1049.java" target="_blank" rel="noopener">1049 数列的片段和</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1050.java" target="_blank" rel="noopener">1050 螺旋矩阵</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1058.java" target="_blank" rel="noopener">1058 选择题</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1060.java" target="_blank" rel="noopener">1060 爱丁顿数</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1062.java" target="_blank" rel="noopener">1062 最简分数</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1063.java" target="_blank" rel="noopener">1063 计算谱半径</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1065.java" target="_blank" rel="noopener">1065 单身狗</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1066.java" target="_blank" rel="noopener">1066 图像过滤</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1073.java" target="_blank" rel="noopener">1073 多选题常见计分法</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1079.java" target="_blank" rel="noopener">1079 延迟的回文数</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1080.java" target="_blank" rel="noopener">1080 MOOC期终成绩</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1082.java" target="_blank" rel="noopener">1082 射击比赛</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1085.java" target="_blank" rel="noopener">1085 PAT单位排行</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1092.java" target="_blank" rel="noopener">1092 最好吃的月饼</a></li>
+<li></li>
+</ul>
+</li>
+<li><p>部分通过</p>
+<ul>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1014.java" target="_blank" rel="noopener">1014 福尔摩斯的约会</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1028.java" target="_blank" rel="noopener">1028 人口普查</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1031.java" target="_blank" rel="noopener">1031 查验身份证</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1033.java" target="_blank" rel="noopener">1033 旧键盘打字</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1034.java" target="_blank" rel="noopener">1034 有理数四则运算</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1035.java" target="_blank" rel="noopener">1035 插入与归并</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1048.java" target="_blank" rel="noopener">1048 数字加密</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1059.java" target="_blank" rel="noopener">1059 C语言竞赛</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1068.java" target="_blank" rel="noopener">1068 万绿丛中一点红</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1071.java" target="_blank" rel="noopener">1071 小赌怡情</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1072.java" target="_blank" rel="noopener">1072 开学寄语</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1074.java" target="_blank" rel="noopener">1074 宇宙无敌加法器</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1075.java" target="_blank" rel="noopener">1075 链表元素分类</a></li>
+<li><a href="https://github.com/WangBo0818/PAT/blob/master/src/Pat_1095.java" target="_blank" rel="noopener">1095 解码PAT准考证</a></li>
+</ul>
+</li>
+</ul>
+]]></content>
+  </entry>
+  <entry>
     <title>阿里巴巴Java 约规手册：码出高效，码出质量</title>
     <url>/2019/12/25/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4Java%20%E7%BA%A6%E8%A7%84%E6%89%8B%E5%86%8C%EF%BC%9A%E7%A0%81%E5%87%BA%E9%AB%98%E6%95%88%EF%BC%8C%E7%A0%81%E5%87%BA%E8%B4%A8%E9%87%8F/</url>
     <content><![CDATA[<p>最近在和实验室的同学一起给学校教务处做一个教学工作量统计系统，在团队一起合作开发及测试的过程中，我认识到了自己在开发规范方面的不足，虽然以前就看过<strong>阿里巴巴Java 约规手册</strong>，但是我在平时自己做项目、学习的过程中并没有很注意，只遵守驼峰命名等较为基础的约规。在这次的开发过程中，因为开发当中的不规范而导致了很多问题，例如：</p>
