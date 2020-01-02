@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2020-01-02T04:10:19.145Z</updated>
+  <updated>2020-01-02T08:05:44.014Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL 索引原理及优化</title>
+    <link href="http://yoursite.com/2020/01/02/MySQL%20%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E4%BC%98%E5%8C%96/"/>
+    <id>http://yoursite.com/2020/01/02/MySQL%20%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E4%BC%98%E5%8C%96/</id>
+    <published>2020-01-02T08:06:07.002Z</published>
+    <updated>2020-01-02T08:05:44.014Z</updated>
+    
+    <content type="html"><![CDATA[<p>网上对于 MySQL 中的最重要知识点的说法一般有两种：</p><ul><li>索引、事务</li><li>索引、事务和查询</li></ul><p>我认为应该把查询加上，尤其是看到美团技术团队写的一篇关于<a href="https://tech.meituan.com/2014/06/30/mysql-index.html" target="_blank" rel="noopener">MySQL  索引原理及慢查询优化后</a>，其中的查询主要是指查询优化以及编写高效率的 SQL 语句。</p><p>本文主要关注的是有关<strong>索引</strong>方面的，若未特别说明，以下内容默认是基于 <strong>MySQL Innodb</strong>存储引擎的 。</p><h2 id="什么是索引"><a href="#什么是索引" class="headerlink" title="什么是索引"></a>什么是索引</h2><p>MySQL 官方对于索引的定义是：索引是<strong>存储引擎</strong>用于快速查找记录的一种<strong>数据结构</strong>。从官方的定义来看，索引是存储引擎层面的一种数据结构。    通俗来讲，索引就好比字典中的目录，如果我们要在字典中查找 MySQL，就先翻到以 M 开头的目录，然后再根据目录找出 MySQL 这个单词在多少页。</p><h2 id="为什么要使用索引"><a href="#为什么要使用索引" class="headerlink" title="为什么要使用索引"></a>为什么要使用索引</h2><p>在没有深入了解索引之前，我对索引的认识只限于：</p><ul><li><p>索引可以加快查询速度</p></li><li><p>索引分为聚簇索引和非聚簇索引</p><p>现在，我对索引有了更为深入的认识，也不仅仅是只知道索引的优点。我了解了<strong>索引到底有哪些优点</strong>、<strong>为什么索引有这些优点</strong>、<strong>索引有什么缺点</strong>、<strong>索引为什么有这些缺点</strong>。</p></li></ul><h3 id="索引的优点："><a href="#索引的优点：" class="headerlink" title="索引的优点："></a>索引的优点：</h3><p>参考《高性能MySQL》一书</p><ul><li>减少查询需要扫描的数据量（加快了查询速度）</li><li>减少服务器的排序操作和创建临时表的操作（加快了 group by 和 order by 等操作）</li><li>将服务器的随机 IO 变为 顺序 IO（加快查询速度）</li></ul><h3 id="索引的缺点："><a href="#索引的缺点：" class="headerlink" title="索引的缺点："></a>索引的缺点：</h3><ul><li><p>索引会降低插入、删除、修改等操作的速度（原因与下文的索引的数据结构有关）</p></li><li><p>索引需要占用物理和数据空间（很好理解，索引是一种数据结构，里面也存储了数据）</p><p>虽然索引也有其缺点，但是一般的系统<strong>读写比例大概是 10 : 1</strong>，因此。在一定数据范围内（索引不是特别多的情况下），建立索引的好处是远远大于索引的开销的，但是我们还是要避免索引的滥用，要知道索引建立及优化的相关知识。</p></li></ul><h2 id="有哪些类型的索引"><a href="#有哪些类型的索引" class="headerlink" title="有哪些类型的索引"></a>有哪些类型的索引</h2><h3 id="从数据结构的角度"><a href="#从数据结构的角度" class="headerlink" title="从数据结构的角度"></a>从数据结构的角度</h3><ul><li><p>B-树索引/B+树索引（可以参考<a href="http://blog.codinglabs.org/articles/theory-of-mysql-index.html" target="_blank" rel="noopener">MySQL 背后的数据结构及算法原理</a>）</p></li><li><p>哈希索引</p></li><li><p>全文索引</p></li><li><p>空间数据索引</p><h3 id="从物理存储的角度"><a href="#从物理存储的角度" class="headerlink" title="从物理存储的角度"></a>从物理存储的角度</h3></li><li><p>聚集索引（也称聚簇索引）</p></li><li><p>非聚集索引（也称非聚簇索引）</p><h3 id="从逻辑的角度"><a href="#从逻辑的角度" class="headerlink" title="从逻辑的角度"></a>从逻辑的角度</h3></li><li><p>主键索引（特殊的唯一索引，不允许有 null 值）</p></li><li><p>普通索引（单列索引）</p></li><li><p>复合索引（多列索引）</p></li><li><p>唯一索引或非唯一索引</p></li><li><p>空间索引</p></li></ul><h2 id="MySQL-存储引擎"><a href="#MySQL-存储引擎" class="headerlink" title="MySQL 存储引擎"></a>MySQL 存储引擎</h2><h3 id="MyISAM"><a href="#MyISAM" class="headerlink" title="MyISAM"></a>MyISAM</h3><p> MyISAM 存储引擎中索引和数据是分开的，索引文件仅仅保存的是数据记录的地址，因此属于非聚集索引（非聚簇索引）。</p><h4 id="主键索引（Primary-index）"><a href="#主键索引（Primary-index）" class="headerlink" title="主键索引（Primary index）"></a>主键索引（Primary index）</h4><p>  MyISAM 引擎使用 B+Tree作为索引结构，叶节点的 data 存放的是数据记录的地址。</p><h4 id="辅助索引（Secondary-Index）"><a href="#辅助索引（Secondary-Index）" class="headerlink" title="辅助索引（Secondary Index）"></a>辅助索引（Secondary Index）</h4><p>   MyISAM 中的辅助索引与主键索引没有什么太大的区别，只不过主键索引的 Key 是唯一的，而辅助索引的 Key 可以重复。</p><h3 id="Innodb"><a href="#Innodb" class="headerlink" title="Innodb"></a>Innodb</h3><h4 id="主键索引（Primary-index）-1"><a href="#主键索引（Primary-index）-1" class="headerlink" title="主键索引（Primary index）"></a>主键索引（Primary index）</h4><p>  Innodb 引擎的索引和数据在一个文件中，索引的叶节点保存了完整的数据记录和索引，因此属于聚集索引（聚簇索引）。</p><p>因为InnoDB的数据文件本身要按照主键聚集，所以InnoDB要求必须有主键。如果没有显式指定，则MySQL系统会自动选择一个可以唯一标识数据记录的列作为主键，如果不存在这种列，则MySQL自动为InnoDB表生成一个隐含字段rowid作为主键，这个字段长度为6个字节，类型为长整形。</p><p>由于 Innodb 索引 的实现特性，所以推荐使用自增主键，这也就是为什么在建表的时候习惯使用 Primary Key Auto_increment</p><p>使用自增主键有以下好处：</p><ul><li>自增key一般为int等整数型，key比较紧凑，这样m可以非常大，而且索引占用空间小。最极端的例子，如果使用50B的varchar（包括长度），那么m = 4 * 1024 / 54m = 75.85 ~= 76，深度最大log(76/2)(10^7) = 4.43 ~= 5，再加上cache缺失、字符串比较的成本，时间成本增加较大。同时，key由4B增长到50B，整棵索引树的空间占用增长也是极为恐怖的（如果二级索引使用主键定位数据行，则空间增长更加严重）</li><li>MySQL索引底层的数据比较都是整数型比较，如果主键时字符串类型的，里面还有英文，还得转换ASCII码进行比较。所以不建议使用uuid作为主键</li><li>自增的主键使得数据行的插入比如落到索引数的最右侧，发生节点分裂的频率较低。B+Tree实际操作插入过程。如果不是非单调主键，插入过程很大程度会发生节点重排，不利于索引优化的初衷</li></ul><h2 id="创建高性能的索引"><a href="#创建高性能的索引" class="headerlink" title="创建高性能的索引"></a>创建高性能的索引</h2><h3 id="前缀索引"><a href="#前缀索引" class="headerlink" title="前缀索引"></a>前缀索引</h3><p> 在对一个比较长的字符串进行索引时，可以仅索引字符串开始的一部分字符。这样可以大大节约索引空间，从而提高索引效率，但是这样也会降低索引的选择性（降低查询的准确度）。</p><p>索引的选择性: 不重复的值/所有的值. 可以看出索引的选择性为 0-1 ,最高的就是该列唯一,没有重复值</p><p>通过下述 SQL 语句可以计算出长字符串的选择性</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">select </span><br><span class="line">    count(distinct left(long_String,3))&#x2F;count(*) as s3, </span><br><span class="line">    count(distinct left(long_String,4))&#x2F;count(*) as s4,</span><br><span class="line">    count(distinct left(long_String,5))&#x2F;count(*) as s5,</span><br><span class="line">    count(distinct long_String)&#x2F;count(*) as original</span><br><span class="line">from </span><br><span class="line">    user;</span><br></pre></td></tr></table></figure><p>其中查找到的 original 就是原本的选择性, s3 , s4 ,s5 分别是取该列的前3,4,5个字符作为索引的时候的选择性.逐步增加这个数值,当选择性与原来相差不大的时候,就是一个比较合适的前缀索引的长度</p><h3 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h3><p> 一般我们都是有对多个列进行索引的需求的,因为查询的需求多种多样。这个时候我们可以选择建立多个独立的索引或者建立一个联合索引.大多数时候都是联合索引更加合适一些</p><p>从理论上来讲,MySQL在5.0之后的版本里面对支持合并索引,也就是同时使用两个索引,但是MySQL的优化器不一定这样认为，他可能会认为，查询两次B+树的代价高于查询一次索引之后去数据表进行过滤,因此会选择只用一个索引</p><p>使用联合索引的时候,有一个非常重要的因素就是所有的索引列只可以进行最左前缀匹配。在不考虑任何的情况下，应该将选择性高的列放在联合索引的前面</p><h3 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h3><p> 当一个索引包含(或者说是覆盖)需要查询的所有字段的值时,我们称之为覆盖索引。<br> 例如：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select name, age from user where name&#x3D;&quot;王&quot;;</span><br></pre></td></tr></table></figure><p>Innodb 存储引擎支持覆盖索引，即从辅助索引中就可以得到查询的记录，不需要查询聚簇索引中的记录了。可以减少大量的IO操作。</p><p>如果要查询辅助索引中不含有的字段，得先遍历辅助索引，再遍历聚集索引，而如果要查询的字段值在辅助索引上就有，就不用再查聚集索引了，这显然会减少IO操作。</p><h2 id="建立索引的几大原则"><a href="#建立索引的几大原则" class="headerlink" title="建立索引的几大原则"></a>建立索引的几大原则</h2><ul><li>最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(&gt;、&lt;、between、like)就停止匹配，比如a = 1 and b = 2 and c &gt; 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整</li><li>=和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式</li><li>尽量选择区分度高的列作为索引，区分度的公式是count(distinct col)/count(*)，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0</li><li>索引列不能参与计算，保持列“干净”，比如from_unixtime(create_time) = ’2020-02-01’就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp(’2020-02-01’)</li><li>尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可</li></ul><h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p>《高性能MySQL》</p><p><a href="https://juejin.im/post/5b55b842f265da0f9e589e79#heading-7" target="_blank" rel="noopener">数据库两大神器</a></p><p><a href="https://juejin.im/post/5d4d82caf265da039c6360ff#heading-11" target="_blank" rel="noopener">详解 MySQL 索引原理及其优化</a></p><p><a href="https://tech.meituan.com/2014/06/30/mysql-index.html" target="_blank" rel="noopener">MySQL  索引原理及慢查询优化</a></p><p><a href="https://juejin.im/post/5d63348ae51d453b1e478ae3#heading-8" target="_blank" rel="noopener">性能调优-MySQL  索引数据结构详解与索引优化</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;网上对于 MySQL 中的最重要知识点的说法一般有两种：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;索引、事务&lt;/li&gt;
+&lt;li&gt;索引、事务和查询&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;我认为应该把查询加上，尤其是看到美团技术团队写的一篇关于&lt;a href=&quot;https://tech.meituan
+      
+    
+    </summary>
+    
+    
+    
+  </entry>
   
   <entry>
     <title>从 LeetCode_28_strStr() 到 KMP 算法</title>
