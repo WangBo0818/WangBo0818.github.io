@@ -1,6 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>从 LeetCode_28_strStr() 到 KMP 算法</title>
+    <url>/2020/01/02/%E4%BB%8E%20LeetCode_28_strStr()%20%E5%88%B0%20KMP%20%E7%AE%97%E6%B3%95/</url>
+    <content><![CDATA[<p>这些天一直在回顾 LeetCode 上刷过的题，当看到第 28 题实现 strStr() 时，我发现虽然它是简单题，可以使用 Java 的 indesOf() 和暴力遍历轻松的解答，但是更好也更为符合实际的应该是用 <strong>KMP 算法</strong>。关于什么是 KMP 算法，大家可以自己去 google，或者参考<strong>严蔚敏</strong>老师的《数据结构》。</p>
+<p>这里我要分享的只是简单的实现以及其它大佬的解题思路（因为我现在对 KMP 算法理解的也不够深入）。</p>
+<p>KMP 算法的大体思路可以参考<a href="https://www.bilibili.com/video/av11866460?from=search&seid=10982649512556638720" target="_blank" rel="noopener">KMP 字符串匹配算法</a></p>
+<p>个人认为视频讲解比画图讲解会好一点，毕竟视频是动态的。</p>
+<p>KMP 算法中的重难点是 next 数组的生成以及具体实现中模式串匹配。具体可以参考一下文章。珠玉在前，我就不分享自己还不够清晰完整的思路了。等我有了更为深入的理解后会来补充这一部分。</p>
+<ul>
+<li><p><a href="https://blog.csdn.net/v_july_v/article/details/7041827" target="_blank" rel="noopener">从头到尾理解 KMP</a></p>
+</li>
+<li><p><a href="https://zhuanlan.zhihu.com/p/40402710" target="_blank" rel="noopener">深入了解 KMP 算法中的 next 数组</a></p>
+<p>以下是我关于 LeetCode 上的第 28 道题来具体实现 KMP 算法代码</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public int strStr(String haystack, String needle) &#123;</span><br><span class="line">        if(needle &#x3D;&#x3D; null || needle.length() &#x3D;&#x3D; 0) &#123;</span><br><span class="line">            return 0;</span><br><span class="line">        &#125;</span><br><span class="line">        int[] next &#x3D; new int[needle.length()];</span><br><span class="line">        &#x2F;&#x2F; 得到 next 数组</span><br><span class="line">        getNextArr(next, needle);</span><br><span class="line">        &#x2F;&#x2F; 使用双指针进行匹配</span><br><span class="line">        int i &#x3D; 0, j &#x3D; 0;</span><br><span class="line">        while(i &lt; haystack.length() &amp;&amp; j &lt; needle.length()) &#123;</span><br><span class="line">            if(j &#x3D;&#x3D; -1 || haystack.charAt(i) &#x3D;&#x3D; needle.charAt(j)) &#123;</span><br><span class="line">                i++;</span><br><span class="line">                j++;</span><br><span class="line">            &#125;else &#123;</span><br><span class="line">                j &#x3D; next[j];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return j &#x3D;&#x3D; needle.length() ? i - j : -1;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private void getNextArr(int[] next, String needle) &#123;</span><br><span class="line">        int k &#x3D; -1;</span><br><span class="line">        int j &#x3D; 0;</span><br><span class="line">        next[0] &#x3D; -1;</span><br><span class="line">        while(j &lt; needle.length() - 1) &#123;</span><br><span class="line">            if(k &#x3D;&#x3D; -1 || needle.charAt(j) &#x3D;&#x3D; needle.charAt(k)) &#123;</span><br><span class="line">                k++;</span><br><span class="line">                j++;</span><br><span class="line">                next[j] &#x3D; k;</span><br><span class="line">            &#125;else &#123;</span><br><span class="line">                k &#x3D; next[k];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+]]></content>
+  </entry>
+  <entry>
+    <title>Stack Overflow Developer Survey 2019</title>
+    <url>/2020/01/01/Stack%20Overflow%20Developer%20Survey%202019/</url>
+    <content><![CDATA[<p>今天是 2020 年的第一天，回顾过去的 2019 年，似乎也并没有发生什么特别的事情。所以只好和大家分享一下 Stack Overflow 的 2019 年度开发人员调查了（看一下别人的年度总结）。</p>
+<p><a href="https://insights.stackoverflow.com/survey/2019" target="_blank" rel="noopener">Stack Overflow Developer Survey 2019</a><br>这个调查报告有90000名程序员参与，这份调度报告平均花了20分钟，可见，这份报告问了很多的问题，也是很详细的。</p>
+<p><strong>报告中的 key Results 是</strong></p>
+<ul>
+<li>Python是增长最快的主要编程语言，在 Stack Overflow 的调查中，它再次在编程语言中排名上升，今年排在Java之后，成为第二大最受欢迎的语言（仅次于Rust）。</li>
+<li>超过一半的受访者在16岁时就已经编写了第一行代码，尽管这种经历因国家和性别而异。</li>
+<li>DevOps Specialists 和 Site Reliability Engineers （相当于国内的系统架构师）是薪水最高，经验最丰富的开发人员。</li>
+<li>在调查的前几个国家中，中国的开发者最乐观，他们认为今天出生的人的生活会比父母更好。西欧国家（例如法国和德国）的卡发着对未来的乐观程度最低。</li>
+<li>对于最影响程序员生产力的事情，不同测程序员有不同的看法。</li>
+</ul>
+<h2 id="开发人员类型"><a href="#开发人员类型" class="headerlink" title="开发人员类型"></a>开发人员类型</h2><p><img src="https://img-blog.csdnimg.cn/20200101200821754.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="开发人员类型"><br>由上图可知：</p>
+<ul>
+<li><p>对于技术职业来说，整个世界的程序员开始趋于全栈和后端，有51.9%的人是全栈，50%的人是后端，32.8%的人是前端……在这些人中，很多程序员都选了多项，中位数是3项，最常见是前端、后端和全栈全选的。然后，接下来是选两项的，选两项目的包括：数据库管理员和系统管理员，DevOps Specialist 和 Site Reliablility Engineer， 学术研究者和科学家，设计师和前端工程师。</p>
+</li>
+<li><p>前后端的界限越来越不明显，设计师和前端的界限也开始模糊。这应该说明，工具和框架的成熟，让后端程序员和设计师也可以进入到前端工程师的领域，或是前端工程师开始进入后端和设计的领域。总之，复合型人才越来越越成为主流，而前后端也趋于一个相互融合的态势。</p>
+<p>在调查程序开发人员把编程当做爱好还是只是谋生的手段后，得出了一下结论<br><img src="https://img-blog.csdnimg.cn/2020010120130967.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="Coding as a Hobby"><br>从上表可知，绝大多数人还是热爱编程的。确实，热爱在某种程度上可以看做是一种信仰，只有对自己从事的工作充满热爱，才能投入更多的时间和精力，从而成为专业领域内的领先者。</p>
+</li>
+</ul>
+<h2 id="学习编程的年限和从事编程行业的年限以及编写第一行代码的年限"><a href="#学习编程的年限和从事编程行业的年限以及编写第一行代码的年限" class="headerlink" title="学习编程的年限和从事编程行业的年限以及编写第一行代码的年限"></a>学习编程的年限和从事编程行业的年限以及编写第一行代码的年限</h2><p><img src="https://img-blog.csdnimg.cn/20200101201755552.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="学习编程的年限"><br><img src="https://img-blog.csdnimg.cn/20200101201911886.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="从事编程行业的年限"><br><img src="https://img-blog.csdnimg.cn/20200101202149782.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="编写第一行代码的年限"><br>从上图确实是可以看出来互联网一行是吃青春饭的说法并不是空穴来风的（当然，也不是绝对），能够坚持很长时间的程序员只是少数，这也挺正常的，对很大一部分人来说，对这个职业是有或多或少的不满意的，也有一部分人可能会随着技术的更新被淘汰，还有另外很大一部分人是想转管理的。</p>
+<p>从我个人的角度来说，我是愿意坚持做技术的。希望我的这种初心不会随着走出校园、走入社会而渐渐遗失。</p>
+<h2 id="技术"><a href="#技术" class="headerlink" title="技术"></a>技术</h2><p>最流行的语言<br><img src="https://img-blog.csdnimg.cn/2020010120302753.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="最流行的语言"><br>最热门的语言<br><img src="https://img-blog.csdnimg.cn/20200101203150229.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="最热门的语言"><br>Stack Overflow 官方发布的调查报告报告中还包含各种编程语言的薪资图、最常用的 Web 框架、最常用的其它开发框架/库/工具、最受欢迎的操作系统、最常用的数据库以及最常用的开发工具等，如果有兴趣，可以去官方报告查看。</p>
+<h2 id="工作"><a href="#工作" class="headerlink" title="工作"></a>工作</h2><p><img src="https://img-blog.csdnimg.cn/20200101203855815.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="工作方式"><br>从上图可知，绝大多数开发人员是全职的。</p>
+<p><img src="https://img-blog.csdnimg.cn/20200101204101674.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="公司规模"><br>从上图可知，在中小型公司工作的程序员占多数，这也很好理解。</p>
+<p><img src="https://img-blog.csdnimg.cn/20200101204212567.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="Career Values"><br>从上图可知，大部分的程序员还是比较满意自己的工作的。</p>
+<p>不同技术类型程序员的薪水<br><img src="https://img-blog.csdnimg.cn/20200101204428912.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="salary"><br>从上图可知，我们从事后端开发的薪水还是可以的。</p>
+<p><img src="https://img-blog.csdnimg.cn/20200101204637685.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dhbmdibzgxOA==,size_16,color_FFFFFF,t_70" alt="Working Hours"><br>每周工作多少个小时，因为参与调查的开发者大多是外国人，参考价值不是很大，了解一下就好。</p>
+]]></content>
+  </entry>
+  <entry>
     <title>java主流锁之悲观锁和乐观锁的简单模拟实现</title>
     <url>/2019/12/29/java%E4%B8%BB%E6%B5%81%E9%94%81%E4%B9%8B%E6%82%B2%E8%A7%82%E9%94%81%E5%92%8C%E4%B9%90%E8%A7%82%E9%94%81%E7%9A%84%E7%AE%80%E5%8D%95%E6%A8%A1%E6%8B%9F%E5%AE%9E%E7%8E%B0/</url>
     <content><![CDATA[<p>在上一篇文章<a href="https://blog.csdn.net/wangbo818/article/details/103747333" target="_blank" rel="noopener">java主流锁之悲观锁和乐观锁</a>中，我们已经知道了什么是乐观锁和悲观锁以及他们的实现方式和使用场景。</p>
