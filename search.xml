@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>由算法优化引发的思考---路漫漫而修远</title>
+    <url>/2020/01/11/%E7%94%B1%E7%AE%97%E6%B3%95%E4%BC%98%E5%8C%96%E5%BC%95%E5%8F%91%E7%9A%84%E6%80%9D%E8%80%83---%E8%B7%AF%E6%BC%AB%E6%BC%AB%E8%80%8C%E4%BF%AE%E8%BF%9C/</url>
+    <content><![CDATA[<p> LeetCode 32 最长有效括号，这道题我很早就使用暴力破解的解法做过，但是超出时间限制。由于对动态规划算法有了进一步的认识，所以又重新以动态规划的思路来求解。但当我看到官方题解中其他的解法后，感觉自己的智商受到了碾压，官方题解的解法三和解法四（大家有兴趣可以去看一下）都给了我耳目一新的感觉。</p>
+<p>一叶而可知秋，对于任何算法或者其他具体问题，都可以通过不断的改进而找到更好的解决方案。这道题让我想到了斐波那契数列的求解的不断优化，我最初的解法是直接使用递归求解，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public int Fibonacci(int n) &#123;</span><br><span class="line">        if(n &#x3D;&#x3D; 0) &#123;</span><br><span class="line">            return 0;</span><br><span class="line">        &#125;</span><br><span class="line">        if(n &#x3D;&#x3D; 1) &#123;</span><br><span class="line">            return 1;</span><br><span class="line">        &#125;</span><br><span class="line">        return Fibonacci(n - 1) + Fibonacci(n - 2);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>但是直接使用递归求解，会重复计算一些子问题，例如，f(4)会计算f(3)和f(2)，而f(3)会计算f(2)和f(1),这样f(2)就被重复计算了一次</p>
+<p>因此，可以使用动态规划将原问题的多个子问题的解存起来，这样就避免了重复计算，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public int Fibonacci2(int n) &#123;</span><br><span class="line">        if(n &lt;&#x3D; 1) &#123;</span><br><span class="line">            return n;</span><br><span class="line">        &#125;</span><br><span class="line">        int[] dp &#x3D; new int[n + 1];</span><br><span class="line">        dp[0] &#x3D; 1;</span><br><span class="line">        for(int i &#x3D; 2; i &lt;&#x3D; n; i++) &#123;</span><br><span class="line">            dp[n] &#x3D; dp[n - 1] + dp[n - 2];</span><br><span class="line">        &#125;</span><br><span class="line">        return dp[n];</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>动态规划的时间复杂度很好，但是空间复杂度还是 O(n)，因此可以对空间复杂度进行优化，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public int Fibonacci3(int n) &#123;</span><br><span class="line">        if(n &lt;&#x3D; 1) &#123;</span><br><span class="line">            return n;</span><br><span class="line">        &#125;</span><br><span class="line">        int first &#x3D; 0;</span><br><span class="line">        int second &#x3D; 1;</span><br><span class="line">        int result &#x3D; 0;</span><br><span class="line">        for(int i &#x3D; 2; i &lt;&#x3D; n; i++) &#123;</span><br><span class="line">            result +&#x3D; first + second;</span><br><span class="line">            first &#x3D; second;</span><br><span class="line">            second &#x3D; result;</span><br><span class="line">        &#125;</span><br><span class="line">        return result;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>从这些算法题的不断优化的过程中，我体会到了什么叫没有最好，只有更好。希望自己以后可以像那些大牛一样，对任何问题都能做出最优的解答。<strong>路漫漫而修远啊！</strong></p>
+]]></content>
+  </entry>
+  <entry>
     <title>MySQL 索引原理及优化</title>
     <url>/2020/01/02/MySQL%20%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%8F%8A%E4%BC%98%E5%8C%96/</url>
     <content><![CDATA[<p>网上对于 MySQL 中的最重要知识点的说法一般有两种：</p>
