@@ -91,7 +91,7 @@
 <meta name="description" content="在上一篇文章java主流锁之悲观锁和乐观锁中，我们已经知道了什么是乐观锁和悲观锁以及他们的实现方式和使用场景。 现在就来简单模拟实现悲观锁和乐观锁 悲观锁首先在数据库中创建一张goods 表向数据库中插入一条记录如果要进行减少count 操作的话，则首先查询出count 数量，若count 数量大于0，则可以进行修改操作。悲观锁是在查询的时候就将该条记录锁定此时其他的客户端只能进行查询操作，而无法">
 <meta property="og:type" content="article">
 <meta property="og:title" content="java主流锁之悲观锁和乐观锁的简单模拟实现">
-<meta property="og:url" content="http://yoursite.com/2019/12/29/java%E4%B8%BB%E6%B5%81%E9%94%81%E4%B9%8B%E6%82%B2%E8%A7%82%E9%94%81%E5%92%8C%E4%B9%90%E8%A7%82%E9%94%81%E7%9A%84%E7%AE%80%E5%8D%95%E6%A8%A1%E6%8B%9F%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:url" content="http://wang818.top/2019/12/29/java%E4%B8%BB%E6%B5%81%E9%94%81%E4%B9%8B%E6%82%B2%E8%A7%82%E9%94%81%E5%92%8C%E4%B9%90%E8%A7%82%E9%94%81%E7%9A%84%E7%AE%80%E5%8D%95%E6%A8%A1%E6%8B%9F%E5%AE%9E%E7%8E%B0/index.html">
 <meta property="og:site_name" content="Talk is cheap.Show me the code.">
 <meta property="og:description" content="在上一篇文章java主流锁之悲观锁和乐观锁中，我们已经知道了什么是乐观锁和悲观锁以及他们的实现方式和使用场景。 现在就来简单模拟实现悲观锁和乐观锁 悲观锁首先在数据库中创建一张goods 表向数据库中插入一条记录如果要进行减少count 操作的话，则首先查询出count 数量，若count 数量大于0，则可以进行修改操作。悲观锁是在查询的时候就将该条记录锁定此时其他的客户端只能进行查询操作，而无法">
 <meta property="og:image" content="https://img-blog.csdnimg.cn/20191228224524227.png">
@@ -140,7 +140,7 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2019/12/29/java主流锁之悲观锁和乐观锁的简单模拟实现/"/>
+  <link rel="canonical" href="http://wang818.top/2019/12/29/java主流锁之悲观锁和乐观锁的简单模拟实现/"/>
 
 
 
@@ -318,7 +318,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/29/java%E4%B8%BB%E6%B5%81%E9%94%81%E4%B9%8B%E6%82%B2%E8%A7%82%E9%94%81%E5%92%8C%E4%B9%90%E8%A7%82%E9%94%81%E7%9A%84%E7%AE%80%E5%8D%95%E6%A8%A1%E6%8B%9F%E5%AE%9E%E7%8E%B0/">
+    <link itemprop="mainEntityOfPage" href="http://wang818.top/2019/12/29/java%E4%B8%BB%E6%B5%81%E9%94%81%E4%B9%8B%E6%82%B2%E8%A7%82%E9%94%81%E5%92%8C%E4%B9%90%E8%A7%82%E9%94%81%E7%9A%84%E7%AE%80%E5%8D%95%E6%A8%A1%E6%8B%9F%E5%AE%9E%E7%8E%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Wang Bo">
